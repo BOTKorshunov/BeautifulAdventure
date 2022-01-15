@@ -11,7 +11,6 @@ namespace BeautifulAdventure.View
 
             MainAppWindow.Window = this;
             MainAppFrame.CustomFrame.Frame = FrmGame;
-            //GameFrame.Navigate();
         }
     }
 }
