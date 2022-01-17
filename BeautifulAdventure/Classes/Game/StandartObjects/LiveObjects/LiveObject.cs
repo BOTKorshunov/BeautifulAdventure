@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BeautifulAdventure.Classes.Game.ObjectSettings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,39 +12,32 @@ namespace BeautifulAdventure.Classes.Game.StandartObjects.LiveObjects
     {
         private ImageObject _mainObject;
         private ImageObject _crackObject;
-        private readonly int _startStrength;
-        private int _strength;
+        private ObjectSetting _objectSetting;
 
         public ImageObject MainObject => _mainObject;
         public ImageObject CrackObject => _crackObject;
-        public int Strength => _strength;
+        public ObjectSetting ObjectSetting => _objectSetting;
 
-        public LiveObject(ImageObject imageObject, int strength)
+        public LiveObject(int x, int y, ObjectSetting objectInfo)
         {
-            int x = imageObject.X;
-            int y = imageObject.Y;
-            string imgSource = imageObject.Image.Source.ToString();
-
-            _mainObject = new ImageObject(x, y, imgSource);
+            _objectSetting = objectInfo;
+            _mainObject = new ImageObject(x, y, objectInfo.ImgSource);
             _crackObject = new ImageObject(x, y, null);
-
-            _startStrength = strength;
-            _strength = strength;
         }
 
         public void TakeDamage(int damage)
         {
-            _strength -= damage;
+            _objectSetting.TakeDamage(damage);
 
-            if (_strength > 0) SetCrackImage();
+            if (_objectSetting.Health > 0) SetCrackImage();
             else Crash();
         }
 
         private void SetCrackImage()
         {
-            double coeficient = (double)_startStrength / _strength;
+            double coeficient = (double)_objectSetting.StartHealth / _objectSetting.Health;
             int percent = (int)Math.Round(100 / coeficient);
-            string imgSource = "/Images/Crack/";
+            string imgSource = "/Images/Cracks/";
             if (percent < 10) _crackObject.SetImageSource(imgSource + "crack9.png");
             else if (percent < 20) _crackObject.SetImageSource(imgSource + "crack8.png");
             else if (percent < 30) _crackObject.SetImageSource(imgSource + "crack7.png");

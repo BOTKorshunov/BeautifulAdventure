@@ -1,14 +1,15 @@
-﻿using System;
+﻿using BeautifulAdventure.Classes.Game.ObjectSettings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeautifulAdventure.Classes.Game.StandartObjects.LiveObjects
+namespace BeautifulAdventure.Classes.Game.StandartObjects.LiveObjects.MovingObjects
 {
     public class MovingObject : LiveObject
     {
-        public MovingObject(ImageObject imageObject, int strength) : base(imageObject, strength) { }
+        public MovingObject(int x, int y, ObjectSetting objectSetting) : base(x, y, objectSetting) { }
 
         public void Move(int x, int y)
         {

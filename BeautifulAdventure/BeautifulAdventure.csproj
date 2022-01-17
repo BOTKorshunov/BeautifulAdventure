@@ -74,10 +74,16 @@
     <Compile Include="Classes\Application\MainAppFrame.cs" />
     <Compile Include="Classes\Application\MainAppWindow.cs" />
     <Compile Include="Classes\CustomFrame.cs" />
+    <Compile Include="Classes\Game\ObjectSettings\AllBlocks.cs" />
+    <Compile Include="Classes\Game\ObjectSettings\AllMobs.cs" />
+    <Compile Include="Classes\Game\ObjectSettings\ObjectSetting.cs" />
+    <Compile Include="Classes\Game\ObjectSettings\ObjectSettingWithRarity.cs" />
+    <Compile Include="Classes\Game\Rarities\AllRarities.cs" />
+    <Compile Include="Classes\Game\Rarities\Rarity.cs" />
     <Compile Include="Classes\Game\GameFieldFrame.cs" />
     <Compile Include="Classes\Game\StandartObjects\ImageObject.cs" />
     <Compile Include="Classes\Game\StandartObjects\LiveObjects\LiveObject.cs" />
-    <Compile Include="Classes\Game\StandartObjects\LiveObjects\MovingObject.cs" />
+    <Compile Include="Classes\Game\StandartObjects\LiveObjects\MovingObjects\MovingObject.cs" />
     <Compile Include="Classes\Game\StandartObjects\RectangleObject.cs" />
     <Compile Include="Classes\Game\StandartObjects\StandartObject.cs" />
     <Compile Include="View\Game\Pages\GamePage.xaml.cs">
@@ -124,25 +130,29 @@
     <Resource Include="Images\Player\steve.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Block\obsidian.png" />
+    <Resource Include="Images\Blocks\obsidian.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Crack\crack0.png" />
-    <Resource Include="Images\Crack\crack1.png" />
-    <Resource Include="Images\Crack\crack2.png" />
-    <Resource Include="Images\Crack\crack3.png" />
-    <Resource Include="Images\Crack\crack4.png" />
-    <Resource Include="Images\Crack\crack5.png" />
-    <Resource Include="Images\Crack\crack6.png" />
-    <Resource Include="Images\Crack\crack7.png" />
-    <Resource Include="Images\Crack\crack8.png" />
-    <Resource Include="Images\Crack\crack9.png" />
+    <Resource Include="Images\Cracks\crack0.png" />
+    <Resource Include="Images\Cracks\crack1.png" />
+    <Resource Include="Images\Cracks\crack2.png" />
+    <Resource Include="Images\Cracks\crack3.png" />
+    <Resource Include="Images\Cracks\crack4.png" />
+    <Resource Include="Images\Cracks\crack5.png" />
+    <Resource Include="Images\Cracks\crack6.png" />
+    <Resource Include="Images\Cracks\crack7.png" />
+    <Resource Include="Images\Cracks\crack8.png" />
+    <Resource Include="Images\Cracks\crack9.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Block\dirt.png" />
+    <Resource Include="Images\Blocks\dirt.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Block\stone.png" />
+    <Resource Include="Images\Blocks\stone.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Mobs\skeleton.png" />
+    <Resource Include="Images\Mobs\zombie.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
