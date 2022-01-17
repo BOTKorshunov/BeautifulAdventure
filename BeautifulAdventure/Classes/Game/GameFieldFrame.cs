@@ -2,6 +2,6 @@
 {
     public class GameFieldFrame
     {
-        public static CustomFrame CustomFrame;
+        public static CustomFrame CustomFrame = new CustomFrame();
     }
 }

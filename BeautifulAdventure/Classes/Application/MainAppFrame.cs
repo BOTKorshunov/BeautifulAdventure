@@ -9,6 +9,6 @@ namespace BeautifulAdventure.Classes.Application
 {
     public class MainAppFrame
     {
-        public static CustomFrame CustomFrame;
+        public static CustomFrame CustomFrame = new CustomFrame();
     }
 }

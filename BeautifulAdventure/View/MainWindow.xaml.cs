@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using BeautifulAdventure.Classes.Application;
+using BeautifulAdventure.View.Game.Pages;
 
 namespace BeautifulAdventure.View
 {
@@ -11,6 +12,7 @@ namespace BeautifulAdventure.View
 
             MainAppWindow.Window = this;
             MainAppFrame.CustomFrame.Frame = FrmGame;
+            FrmGame.Navigate(new GamePage());
         }
     }
 }

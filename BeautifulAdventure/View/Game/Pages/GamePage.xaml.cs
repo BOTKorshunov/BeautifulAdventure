@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using BeautifulAdventure.Classes.Game;
+using BeautifulAdventure.View.Game.Pages.Locations;
 
 namespace BeautifulAdventure.View.Game.Pages
 {
@@ -16,6 +17,7 @@ namespace BeautifulAdventure.View.Game.Pages
             InitializeComponent();
 
             GameFieldFrame.CustomFrame.Frame = FrmGameField;
+            FrmGameField.Navigate(new MinePage());
         }
     }
 }

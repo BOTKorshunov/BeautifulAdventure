@@ -59,6 +59,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Game\Pages\Locations\MinePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -71,8 +75,16 @@
     <Compile Include="Classes\Application\MainAppWindow.cs" />
     <Compile Include="Classes\CustomFrame.cs" />
     <Compile Include="Classes\Game\GameFieldFrame.cs" />
+    <Compile Include="Classes\Game\StandartObjects\ImageObject.cs" />
+    <Compile Include="Classes\Game\StandartObjects\LiveObjects\LiveObject.cs" />
+    <Compile Include="Classes\Game\StandartObjects\LiveObjects\MovingObject.cs" />
+    <Compile Include="Classes\Game\StandartObjects\RectangleObject.cs" />
+    <Compile Include="Classes\Game\StandartObjects\StandartObject.cs" />
     <Compile Include="View\Game\Pages\GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Game\Pages\Locations\MinePage.xaml.cs">
+      <DependentUpon>MinePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -106,8 +118,31 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="View\Game\Pages\Locations\" />
     <Folder Include="View\Game\Windows\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Player\steve.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Block\obsidian.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Crack\crack0.png" />
+    <Resource Include="Images\Crack\crack1.png" />
+    <Resource Include="Images\Crack\crack2.png" />
+    <Resource Include="Images\Crack\crack3.png" />
+    <Resource Include="Images\Crack\crack4.png" />
+    <Resource Include="Images\Crack\crack5.png" />
+    <Resource Include="Images\Crack\crack6.png" />
+    <Resource Include="Images\Crack\crack7.png" />
+    <Resource Include="Images\Crack\crack8.png" />
+    <Resource Include="Images\Crack\crack9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Block\dirt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Block\stone.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
