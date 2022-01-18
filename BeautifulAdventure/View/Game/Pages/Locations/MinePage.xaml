@@ -9,5 +9,6 @@
       Title="Mine">
 
     <Grid Name="GridMineField" Focusable="True"
-          PreviewKeyDown="GridMineField_PreviewKeyDown"/>
+          PreviewKeyDown="GridMineField_PreviewKeyDown"
+          PreviewKeyUp="GridMineField_PreviewKeyUp"/>
 </Page>

@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using BeautifulAdventure.Classes.Game.ObjectSettings;
 using BeautifulAdventure.Classes.Game.Rarties;
 using BeautifulAdventure.Classes.Game.StandartObjects;
@@ -21,9 +13,6 @@ using BeautifulAdventure.Classes.Game.StandartObjects.LiveObjects.MovingObjects;
 
 namespace BeautifulAdventure.View.Game.Pages.Locations
 {
-    /// <summary>
-    /// Логика взаимодействия для Mine.xaml
-    /// </summary>
     public partial class MinePage : Page
     {
         private static Random _rnd = new Random();
@@ -46,6 +35,9 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             CreatePlayer();
         }
 
+        /// <summary>
+        /// Устанавливает возможные настройки блоков
+        /// </summary>
         private void SetPossibleBlocks()
         {
             AllBlocks allBlocks = new AllBlocks();
@@ -58,6 +50,9 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             };
         }
 
+        /// <summary>
+        /// Устанавливает возможные настройки мобов
+        /// </summary>
         private void SetPossibleMobs()
         {
             AllMobs allMobs = new AllMobs();
@@ -70,6 +65,20 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             };
         }
 
+        /// <summary>
+        /// Добавляет объект на игровое поле
+        /// </summary>
+        /// <param name="element"></param>
+        private void AddObjectInGameField(FrameworkElement element)
+        {
+            GridMineField.Children.Add(element);
+        }
+
+        /// <summary>
+        /// Создаёт игровое поле
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="rows"></param>
         private void CreateField(int columns, int rows)
         {
             for (int i = 0; i < columns; i++)
@@ -83,15 +92,21 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             CreateBlocksAndMobs(columns, rows);
         }
 
+        /// <summary>
+        /// Создаёт поверхность (пол) на игрвом поле
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="rows"></param>
         private void CreateFloor(int columns, int rows)
         {
             for (int row = 0; row < rows; row++)
             {
                 for (int column = 0; column < columns; column++)
                 {
-                    ObjectSetting block = GetRandomObjectSetting(_possibleBlocks);
+                    ObjectSettingWithRarity randomObjectSettingWithRarity = GetRandomObjectSettingWithRarity(_possibleBlocks);
+                    ObjectSetting blockSetting = GetNewObjectSetting(randomObjectSettingWithRarity);
 
-                    ImageObject floor = new ImageObject(column, row, block.ImgSource);
+                    ImageObject floor = new ImageObject(column, row, blockSetting.ImgSource);
                     GridMineField.Children.Add(floor.Image);
 
                     RectangleObject shadow = new RectangleObject(column, row, Brushes.Black, 0.4);
@@ -100,6 +115,11 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             }
         }
 
+        /// <summary>
+        /// Создаёт барьеры (неломаемые объекты) на игровом поле
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="rows"></param>
         private void CreateBarriers(int columns, int rows)
         {
             string imgSource = "/Images/Blocks/obsidian.png";
@@ -108,18 +128,18 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             {
                 ImageObject barrierUp = new ImageObject(i, 0, imgSource);
                 _barriers.Add(barrierUp);
-                GridMineField.Children.Add(barrierUp.Image);
+                AddObjectInGameField(barrierUp.Image);
 
                 ImageObject barrierDown = new ImageObject(i, rows - 1, imgSource);
                 _barriers.Add(barrierDown);
-                GridMineField.Children.Add(barrierDown.Image);
+                AddObjectInGameField(barrierDown.Image);
             }
                 
             for (int i = 1; i < rows - 1; i++)
             {
                 ImageObject barrierUp = new ImageObject(0, i, imgSource);
                 _barriers.Add(barrierUp);
-                GridMineField.Children.Add(barrierUp.Image);
+                AddObjectInGameField(barrierUp.Image);
 
                 ImageObject barrierDown = new ImageObject(columns - 1, i, imgSource);
                 _barriers.Add(barrierDown);
@@ -127,93 +147,115 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             }
         }
 
+        /// <summary>
+        /// Создаёт блоки и мобов на игровом поле
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="rows"></param>
         private void CreateBlocksAndMobs(int columns, int rows)
         {
-            Rarity[] objectRarities =
+            ObjectSettingWithRarity[] objectSettingWithRarities =
             {
-                new Rarity("Блок", 60),
-                new Rarity("Моб", 5),
-                new Rarity("Ничего", 35)
+                new ObjectSettingWithRarity(null, new Rarity("Блок", 60)),
+                new ObjectSettingWithRarity(null, new Rarity("Моб", 5)),
+                new ObjectSettingWithRarity(null, new Rarity("Ничего", 35)),
             };
 
-            int objectRaririesSum = objectRarities.Select(rarity => rarity.Chance).Sum();
             for (int row = 2; row < rows - 1; row++)
             {
                 for (int column = 1; column < columns - 1; column++)
                 {
-                    int randNum = _rnd.Next(objectRaririesSum);
-                    int sum = 0;
-                    Rarity selectRarity = null;
+                    ObjectSettingWithRarity randomObjectSettingWithRarity = GetRandomObjectSettingWithRarity(objectSettingWithRarities);
 
-                    foreach (var rarity in objectRarities)
-                    {
-                        if (randNum >= sum && randNum <= sum + rarity.Chance)
-                        {
-                            selectRarity = rarity;
-                            break;
-                        }
-                        else
-                            sum += rarity.Chance;
-                    }
-
-                    if (selectRarity == objectRarities[0]) CreateBlock(column, row); 
-                    else if (selectRarity == objectRarities[1]) CreateMob(column, row);
+                    if (randomObjectSettingWithRarity == objectSettingWithRarities[0]) CreateBlock(column, row); 
+                    else if (randomObjectSettingWithRarity == objectSettingWithRarities[1]) CreateMob(column, row);
                 }
             }
 
             foreach (var block in _blocksOnField)
             {
-                GridMineField.Children.Add(block.MainObject.Image);
-                GridMineField.Children.Add(block.CrackObject.Image);
+                AddObjectInGameField(block.MainObject.Image);
+                AddObjectInGameField(block.CrackObject.Image);
             }
 
             foreach (var mob in _mobsOnField)
             {
-                GridMineField.Children.Add(mob.MainObject.Image);
-                GridMineField.Children.Add(mob.CrackObject.Image);
+                AddObjectInGameField(mob.MainObject.Image);
+                AddObjectInGameField(mob.CrackObject.Image);
             }
         }
 
-        private ObjectSetting GetRandomObjectSetting(ObjectSettingWithRarity[] objectSettingWithRarities)
+        /// <summary>
+        /// Выбирает случайную настройку объекта с редкостью в зависимости от редкости
+        /// </summary>
+        /// <param name="objectSettingWithRarities"></param>
+        /// <returns>Случайная настройка объекта с редкостью</returns>
+        private ObjectSettingWithRarity GetRandomObjectSettingWithRarity(ObjectSettingWithRarity[] objectSettingWithRarities)
         {
             int raritiesSum = objectSettingWithRarities.Select
                 (objectSettingWithRarity => objectSettingWithRarity.Rarity.Chance).Sum();
             int randNum = _rnd.Next(raritiesSum);
 
             raritiesSum = 0;
+            ObjectSettingWithRarity randomObjectSettingWithRarity = null;
             foreach (var objectSettingWithRarity in objectSettingWithRarities)
             {
                 if (randNum >= raritiesSum &&
                     randNum <= raritiesSum + objectSettingWithRarity.Rarity.Chance)
                 {
-                    string name = objectSettingWithRarity.ObjectSetting.Name;
-                    string imgSource = objectSettingWithRarity.ObjectSetting.ImgSource;
-                    int health = objectSettingWithRarity.ObjectSetting.Health;
-                    int attackPower = objectSettingWithRarity.ObjectSetting.AttackPower;
-                    Thread.Sleep(1);
-                    return new ObjectSetting(name, imgSource, health, attackPower);
+                    randomObjectSettingWithRarity = objectSettingWithRarity;
+                    break;
                 }
                 else
                     raritiesSum += objectSettingWithRarity.Rarity.Chance;
             }
 
-            return null;
+            return randomObjectSettingWithRarity;
         }
 
+        /// <summary>
+        /// Создаёт новую настройку объекта на основе входной настройки объекта с редкостью
+        /// </summary>
+        /// <param name="objectSettingWithRarity"></param>
+        /// <returns>Новая настройка объекта</returns>
+        private ObjectSetting GetNewObjectSetting(ObjectSettingWithRarity objectSettingWithRarity)
+        {
+            string name = objectSettingWithRarity.ObjectSetting.Name;
+            string imgSource = objectSettingWithRarity.ObjectSetting.ImgSource;
+            int health = objectSettingWithRarity.ObjectSetting.Health;
+            int attackPower = objectSettingWithRarity.ObjectSetting.AttackPower;
+            return new ObjectSetting(name, imgSource, health, attackPower);
+        }
+
+        /// <summary>
+        /// Создаёт блок
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         private void CreateBlock(int x, int y)
         {
-            ObjectSetting blockSetting = GetRandomObjectSetting(_possibleBlocks);
-            LiveObject liveObject = new LiveObject(x, y, blockSetting);
-            _blocksOnField.Add(liveObject);
+            ObjectSettingWithRarity randomObjectSettingWithRarity = GetRandomObjectSettingWithRarity(_possibleBlocks);
+            ObjectSetting blockSetting = GetNewObjectSetting(randomObjectSettingWithRarity);
+            LiveObject block = new LiveObject(x, y, blockSetting);
+            _blocksOnField.Add(block);
         }
 
+        /// <summary>
+        /// Создаёт моба
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         private void CreateMob(int x, int y)
         {
-            ObjectSetting mobSetting = GetRandomObjectSetting(_possibleMobs);
+            ObjectSettingWithRarity randomObjectSettingWithRarity = GetRandomObjectSettingWithRarity(_possibleMobs);
+            ObjectSetting mobSetting = GetNewObjectSetting(randomObjectSettingWithRarity);
             MovingObject movingObject = new MovingObject(x, y, mobSetting);
             _mobsOnField.Add(movingObject);
         }
 
+        /// <summary>
+        /// Создаёт игрока
+        /// </summary>
         private void CreatePlayer()
         {
             ObjectSetting objectSetting = new ObjectSetting("Игрок", "/Images/Player/steve.png", 20, 1);
@@ -222,6 +264,12 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             GridMineField.Children.Add(_player.CrackObject.Image);
         }
 
+        /// <summary>
+        /// Меняет значение x или y в зависимости от направления нажатой клавиши
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="key"></param>
         private void ChangeLocation(ref int x, ref int y, Key key)
         {
             switch (key)
@@ -233,6 +281,11 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             }
         }
 
+        /// <summary>
+        /// Ищет барьер перед игроком
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>Найденный барьер</returns>
         private StandartObject FindBarrier(Key key)
         {
             int xPlayer = _player.MainObject.X;
@@ -245,55 +298,66 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
             return findBarrier;
         }
 
-        private LiveObject FindLiveObject(Key key)
+        /// <summary>
+        /// Ищет блок или моба перед игроком
+        /// </summary>
+        /// <param name="liveObjects"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private LiveObject FindLiveObject(LiveObject[] liveObjects, Key key)
         {
             int xPlayer = _player.MainObject.X;
             int yPlayer = _player.MainObject.Y;
             ChangeLocation(ref xPlayer, ref yPlayer, key);
 
-            LiveObject findLiveObject = 
-                _blocksOnField.FirstOrDefault(liveObject => liveObject.MainObject.X == xPlayer
+            LiveObject findLiveObject =
+                liveObjects.FirstOrDefault(liveObject => liveObject.MainObject.X == xPlayer
                         && liveObject.MainObject.Y == yPlayer);
 
             return findLiveObject;
         }
 
-        private MovingObject FindMovingObject(Key key)
-        {
-            int xPlayer = _player.MainObject.X;
-            int yPlayer = _player.MainObject.Y;
-            ChangeLocation(ref xPlayer, ref yPlayer, key);
-
-            MovingObject findMovingObject =
-                _mobsOnField.FirstOrDefault(movingObject => movingObject.MainObject.X == xPlayer
-                        && movingObject.MainObject.Y == yPlayer);
-
-            return findMovingObject;
-        }
-
+        /// <summary>
+        /// Проверкяет будущую позицию игрока на наличие препятствий
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>true, если на будущей позиции нет препятствия, false - если есть</returns>
         private bool CheckFuturePlayerLocation(Key key)
         {
             StandartObject findBarrier = FindBarrier(key);
             if (findBarrier != null) return false;
 
-            LiveObject findLiveObject = FindLiveObject(key);
-            if (findLiveObject != null && findLiveObject.ObjectSetting.Health > 0)
+            LiveObject findBlock = FindLiveObject(_blocksOnField.ToArray(), key);
+            if (findBlock != null)
             {
-                findLiveObject.TakeDamage(_player.ObjectSetting.AttackPower);
-                return false;
+                if (findBlock.ObjectSetting.Health > 0)
+                {
+                    findBlock.TakeDamage(_player.ObjectSetting.AttackPower);
+                    return false;
+                }
+                else _blocksOnField.Remove(findBlock);
             }
 
-            MovingObject findMovingObject = FindMovingObject(key);
-            if (findMovingObject != null && findMovingObject.ObjectSetting.Health > 0)
+            MovingObject findMob = (MovingObject)FindLiveObject(_mobsOnField.ToArray(), key);
+            if (findMob != null)
             {
-                findMovingObject.TakeDamage(_player.ObjectSetting.AttackPower);
-                return false;
+                if (findMob.ObjectSetting.Health > 0)
+                {
+                    findMob.TakeDamage(_player.ObjectSetting.AttackPower);
+                    return false;
+                }
+                else _mobsOnField.Remove(findMob);
             }
 
             return true;
         }
 
         private void GridMineField_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void GridMineField_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (CheckFuturePlayerLocation(e.Key))
             {
