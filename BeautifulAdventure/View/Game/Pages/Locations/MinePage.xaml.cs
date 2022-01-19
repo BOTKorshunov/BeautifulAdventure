@@ -5,24 +5,27 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using BeautifulAdventure.Classes.Game.ObjectSettings;
+using BeautifulAdventure.Classes.Game;
+using BeautifulAdventure.Classes.Game.Settings.ObjectSettings;
 using BeautifulAdventure.Classes.Game.Rarties;
 using BeautifulAdventure.Classes.Game.StandartObjects;
 using BeautifulAdventure.Classes.Game.StandartObjects.LiveObjects;
 using BeautifulAdventure.Classes.Game.StandartObjects.LiveObjects.MovingObjects;
+using BeautifulAdventure.Classes.Game.Settings;
 
 namespace BeautifulAdventure.View.Game.Pages.Locations
 {
     public partial class MinePage : Page
     {
         private static Random _rnd = new Random();
+        private static Key[] _possibleKeys = { Key.Left, Key.Up, Key.Right, Key.Down };
 
         private ObjectSettingWithRarity[] _possibleBlocks;
         private ObjectSettingWithRarity[] _possibleMobs;
         private List<ImageObject> _barriers = new List<ImageObject>();
         private List<LiveObject> _blocksOnField = new List<LiveObject>();
         private List<MovingObject> _mobsOnField = new List<MovingObject>();
-        private MovingObject _player;
+        private PlayerObject _player;
 
         public MinePage()
         {
@@ -258,8 +261,9 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
         /// </summary>
         private void CreatePlayer()
         {
-            ObjectSetting objectSetting = new ObjectSetting("Игрок", "/Images/Player/steve.png", 20, 1);
-            _player = new MovingObject(1, 1, objectSetting);
+            ObjectSetting objectSetting = new ObjectSetting("Игрок", "/Images/Player/steve.png", 20, 2);
+            PlayerSetting playerSetting = new PlayerSetting(3);
+            _player = new PlayerObject(1, 1, objectSetting, playerSetting);
             GridMineField.Children.Add(_player.MainObject.Image);
             GridMineField.Children.Add(_player.CrackObject.Image);
         }
@@ -286,14 +290,9 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
         /// </summary>
         /// <param name="key"></param>
         /// <returns>Найденный барьер</returns>
-        private StandartObject FindBarrier(Key key)
+        private ImageObject FindBarrier(int x, int y)
         {
-            int xPlayer = _player.MainObject.X;
-            int yPlayer = _player.MainObject.Y;
-            ChangeLocation(ref xPlayer, ref yPlayer, key);
-
-            StandartObject findBarrier = 
-                _barriers.FirstOrDefault(barrier => barrier.X == xPlayer && barrier.Y == yPlayer);
+            ImageObject findBarrier = _barriers.FirstOrDefault(barrier => barrier.X == x && barrier.Y == y);
 
             return findBarrier;
         }
@@ -304,41 +303,110 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
         /// <param name="liveObjects"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private LiveObject FindLiveObject(LiveObject[] liveObjects, Key key)
+        private LiveObject FindLiveObject(LiveObject[] liveObjects, int x, int y)
         {
-            int xPlayer = _player.MainObject.X;
-            int yPlayer = _player.MainObject.Y;
-            ChangeLocation(ref xPlayer, ref yPlayer, key);
-
             LiveObject findLiveObject =
-                liveObjects.FirstOrDefault(liveObject => liveObject.MainObject.X == xPlayer
-                        && liveObject.MainObject.Y == yPlayer);
+                liveObjects.FirstOrDefault(liveObject => liveObject.MainObject.X == x
+                        && liveObject.MainObject.Y == y);
 
             return findLiveObject;
         }
 
         /// <summary>
-        /// Проверкяет будущую позицию игрока на наличие препятствий
+        /// Двигает всех мобов на игровом поле
+        /// </summary>
+        private void AllMobsMove()
+        {
+            foreach (var mob in _mobsOnField)
+            {
+                List<Key> ways = new List<Key>();
+                int xMob = mob.MainObject.X;
+                int yMob = mob.MainObject.Y;
+
+                foreach (var key in _possibleKeys)
+                {
+                    int x = xMob;
+                    int y = yMob;
+                    ChangeLocation(ref x, ref y, key);
+
+                    ImageObject findBarrier = FindBarrier(x, y);
+                    if (findBarrier != null) continue;
+
+                    LiveObject findBlock = FindLiveObject(_blocksOnField.ToArray(), x, y);
+                    if (findBlock != null) continue;
+
+                    LiveObject findMob = FindLiveObject(_mobsOnField.ToArray(), x, y);
+                    if (findMob != null) continue;
+
+                    if (x == _player.MainObject.X && y == _player.MainObject.Y) continue;
+                        
+                    ways.Add(key);
+                }
+
+                if (ways.Count > 0)
+                {
+                    int rndNum = _rnd.Next(ways.Count * 2);
+                    if (rndNum < ways.Count)
+                    {
+                        Key way = ways[rndNum];
+                        ChangeLocation(ref xMob, ref yMob, way);
+                        mob.Move(xMob, yMob);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Производит атаку всех мобов (если находятся рядом с игроком)
+        /// </summary>
+        private void AllMobsAttack()
+        {
+            foreach (var mob in _mobsOnField)
+            {
+                int xMob = mob.MainObject.X;
+                int yMob = mob.MainObject.Y;
+
+                foreach (var key in _possibleKeys)
+                {
+                    int x = xMob;
+                    int y = yMob;
+                    ChangeLocation(ref x, ref y, key);
+
+                    if (x == _player.MainObject.X && y == _player.MainObject.Y)
+                    {
+                        _player.TakeDamage(mob.ObjectSetting.AttackPower);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Проверяет будущую позицию игрока на наличие препятствий
         /// </summary>
         /// <param name="key"></param>
         /// <returns>true, если на будущей позиции нет препятствия, false - если есть</returns>
         private bool CheckFuturePlayerLocation(Key key)
         {
-            StandartObject findBarrier = FindBarrier(key);
+            int x = _player.MainObject.X;
+            int y = _player.MainObject.Y;
+            ChangeLocation(ref x, ref y, key);
+
+            ImageObject findBarrier = FindBarrier(x, y);
             if (findBarrier != null) return false;
 
-            LiveObject findBlock = FindLiveObject(_blocksOnField.ToArray(), key);
+            LiveObject findBlock = FindLiveObject(_blocksOnField.ToArray(), x, y);
             if (findBlock != null)
             {
                 if (findBlock.ObjectSetting.Health > 0)
                 {
-                    findBlock.TakeDamage(_player.ObjectSetting.AttackPower);
+                    findBlock.TakeDamage(_player.PlayerSetting.PreyPower);
                     return false;
                 }
                 else _blocksOnField.Remove(findBlock);
             }
 
-            MovingObject findMob = (MovingObject)FindLiveObject(_mobsOnField.ToArray(), key);
+            MovingObject findMob = (MovingObject)FindLiveObject(_mobsOnField.ToArray(), x, y);
             if (findMob != null)
             {
                 if (findMob.ObjectSetting.Health > 0)
@@ -359,13 +427,27 @@ namespace BeautifulAdventure.View.Game.Pages.Locations
 
         private void GridMineField_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            if (CheckFuturePlayerLocation(e.Key))
-            {
-                int xPlayer = _player.MainObject.X;
-                int yPlayer = _player.MainObject.Y;
-                ChangeLocation(ref xPlayer, ref yPlayer, e.Key);
+            Key selectWay = _possibleKeys.FirstOrDefault(way => way == e.Key);
 
-                _player.Move(xPlayer, yPlayer);
+            if (selectWay != Key.None)
+            {
+                if (CheckFuturePlayerLocation(e.Key))
+                {
+                    int xPlayer = _player.MainObject.X;
+                    int yPlayer = _player.MainObject.Y;
+                    ChangeLocation(ref xPlayer, ref yPlayer, e.Key);
+
+                    _player.Move(xPlayer, yPlayer);
+                    AllMobsMove();
+                }
+
+                AllMobsAttack();
+
+                if (_player.ObjectSetting.Health <= 0)
+                {
+                    MessageBox.Show("Вы умерли!");
+                    GameFieldFrame.CustomFrame.Navigate(new MinePage());
+                }
             }
 
             e.Handled = true;

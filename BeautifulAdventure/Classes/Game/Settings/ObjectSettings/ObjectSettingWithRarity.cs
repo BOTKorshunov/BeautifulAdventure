@@ -1,12 +1,11 @@
-﻿using BeautifulAdventure.Classes.Game.ObjectSettings;
-using BeautifulAdventure.Classes.Game.Rarties;
+﻿using BeautifulAdventure.Classes.Game.Rarties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeautifulAdventure.Classes.Game.ObjectSettings
+namespace BeautifulAdventure.Classes.Game.Settings.ObjectSettings
 {
     public class ObjectSettingWithRarity
     {

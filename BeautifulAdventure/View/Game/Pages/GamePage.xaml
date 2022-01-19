@@ -10,11 +10,11 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition />
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
         <Frame Grid.Column="0" NavigationUIVisibility="Hidden"
-               Name="FrmGameField"/>
+               Name="FrmGameField" />
     </Grid>
 </Page>

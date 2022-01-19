@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeautifulAdventure.Classes.Game.ObjectSettings
+namespace BeautifulAdventure.Classes.Game.Settings.ObjectSettings
 {
     public class AllBlocks
     {

@@ -1,4 +1,4 @@
-﻿using BeautifulAdventure.Classes.Game.ObjectSettings;
+﻿using BeautifulAdventure.Classes.Game.Settings.ObjectSettings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
